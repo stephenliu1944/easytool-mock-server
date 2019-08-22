@@ -25,7 +25,7 @@ app.use(function(req, res, next) {
             if (/\.\w{1,5}$/.test(body)) {
                 // 发送文件
                 res.sendFile(body, {
-                    root: path.join(__dirname, settings.filePath)
+                    root: path.join(__dirname, settings.resourcesPath)
                 }, function(err) {
                     err && next(err);
                 });

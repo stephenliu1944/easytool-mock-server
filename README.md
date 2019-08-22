@@ -1,23 +1,19 @@
 # Mock Server
 
 ## Usage
-### 1. Proxy request to mock server
+### 1. Set mock server port
 package.json
 ```js
 "devEnvironments": {
     "servers": {
-        "local": 8080,
-        "mock": 3000
-    },
-    "proxies": {
-        "(/proxy)": "http://localhost:3000"     // proxy to mock server
+        "mock": 3000    // default
     },
     ...
 },
 ```
 
 ### 2. Set mock data
-Default mock data path is "/mock/data/", you could change it in "/mock/settings.js".
+Default mock data path is "/data", you could change it in "/settings.js".
 ```js
 module.exports = [{
     url: '/user/:id',
@@ -34,16 +30,16 @@ module.exports = [{
 
 ### 3. Start mock server
 ```js
-npm run mock
+npm start
 ```
 Or run
 ```js
-/bin/mock.bat   // Windows
-/bin/mock.sh    // Linux
+/bin/start.bat   // Windows
+/bin/start.sh    // Linux
 ```
 
 ## Data format
-You could add any js data file or folder to '/mock/data/' directory.
+You could add any js data file or folder to '/data' directory.
 ```js
 {
     // 'url' is use for compare request url.
@@ -69,8 +65,8 @@ You could add any js data file or folder to '/mock/data/' directory.
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
         },
-        // 'body' is use for set response body, string, object and array are supported, if type to String and end with '.xxx' means this is a file path and default root path is "/mock/resources/", you can change it in "/mock/settings.js".
-        // 'body' 用于配置响应的实体信息, 支持 string, object, array类型, 如果类型为 String 并且以 '.xxx' 后缀结尾, 则表示该配置项为一个文件路径, 且默认根目录为 "/mock/resources/",该功能用于返回文件, 可以在 "mock/settings.js" 中修改默认配置.
+        // 'body' is use for set response body, string, object and array are supported, if type to String and end with '.xxx' means this is a file path and default root path is "/resources", you can change it in "/settings.js".
+        // 'body' 用于配置响应的实体信息, 支持 string, object, array类型, 如果类型为 String 并且以 '.xxx' 后缀结尾, 则表示该配置项为一个文件路径, 且默认根目录为 "/resources",该功能用于返回文件, 可以在 "/settings.js" 中修改默认配置.
         body: {             // require
             ...
         }
@@ -89,13 +85,13 @@ You could add any js data file or folder to '/mock/data/' directory.
 ```
 
 ## Settings
-You could change default setting in "/mock/settings.js"  
-你可以在 "/mock/settings.js" 中修改默认配置.
+You could change default setting in "/settings.js"  
+你可以在 "/settings.js" 中修改默认配置.
 ```js
 {
     // global response headers, with merge to your specific response headers.
     // 全局的响应headers设置, 会合并到你指定的某个响应头配置上.
-    headers: {              // default
+    headers: {                      // default
         'Mock-Data': 'true',
         'Content-Type': 'application/json; charset=UTF-8',
         'Access-Control-Allow-Origin': '*',
@@ -103,10 +99,10 @@ You could change default setting in "/mock/settings.js"
     },
     // mock data directory
     // mock 数据的文件保存目录
-    dataPath: '/data',      // default
+    dataPath: '/data',              // default
     // store resources directory
     // 保存响应返回的文件目录
-    filePath: '/resources',     // default
+    resourcesPath: '/resources',    // default
     // search order with mock data files.
     // 遍历搜索匹配的 mock 文件的顺序, 默认按字母排序.
     sort(filenames) {
@@ -150,7 +146,7 @@ module.exports = [{
             'Content-Type': 'text/plain',
             'Content-Disposition': 'attachment;filename=sample.txt;'
         },
-        body: 'sample.txt'      // file need to save in '/mock/resources' directory. 需要将下载的文件保存在 '/mock/resources' 目录中.
+        body: 'sample.txt'      // file need to save in '/resources' directory. 需要将下载的文件保存在 '/resources' 目录中.
     }
 }];
 ```
@@ -200,19 +196,3 @@ module.exports = [{
 }];
 ```
 [Faker.js API](https://github.com/Marak/Faker.js#readme)
-
-### Work with multiple Servers
-package.json
-```js
-"devEnvironments": {
-    "servers": {
-        "local": 8080,
-        "mock": 3000
-    },
-    "proxies": {
-        "(/proxy)/user/list": "http://localhost:3000",      // this url request will proxy to mock server. the order is important.
-        "(/proxy)": "http://some-domain.com"                // other will proxy to api server.
-    },
-    ...
-},
-```
