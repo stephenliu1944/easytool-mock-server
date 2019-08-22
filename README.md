@@ -164,7 +164,7 @@ module.exports = [{
 
 ### Work with Mock.js
 ```js
-npm i -D mockjs
+npm i mockjs
 ```
 GET http://localhost:3000/user/list
 ```js
@@ -188,7 +188,7 @@ module.exports = [{
 
 ### Work with Faker.js
 ```js
-npm i -D faker
+npm i faker
 ```
 GET http://localhost:3000/user/123  
 ```js
