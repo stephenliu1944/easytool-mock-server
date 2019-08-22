@@ -1,0 +1,26 @@
+{
+  "name": "mock-server",
+  "version": "0.1.0",
+  "description": "Use for mock data.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stephenliu1944/mock-server"
+  },
+  "homepage": "https://github.com/stephenliu1944/mock-server",
+  "bugs": {
+    "url": "https://github.com/stephenliu1944/mock-server/issues"
+  },
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^1.19.1"
+  },
+  "devEnvironments": {
+    "servers": {
+      "mock": 3000
+    }
+  }
+}
