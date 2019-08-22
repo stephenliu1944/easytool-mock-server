@@ -1,7 +1,13 @@
 # Mock Server
 
 ## Usage
-### 1. Set mock server port
+Clone or download project first.
+### 1. Install
+```js
+npm install
+```
+
+### 2. Set mock server port
 package.json
 ```js
 "devEnvironments": {
@@ -12,7 +18,7 @@ package.json
 },
 ```
 
-### 2. Set mock data
+### 3. Write mock data
 Default mock data path is "/data", you could change it in "/settings.js".
 ```js
 module.exports = [{
@@ -28,7 +34,7 @@ module.exports = [{
 }];
 ```
 
-### 3. Start mock server
+### 4. Start mock server
 ```js
 npm start
 ```
@@ -36,6 +42,11 @@ Or run
 ```js
 /bin/start.bat   // Windows
 /bin/start.sh    // Linux
+```
+
+### 5. Request URL
+```js
+http://localhost:3000/user/1
 ```
 
 ## Data format
