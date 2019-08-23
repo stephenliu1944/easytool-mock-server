@@ -1,9 +1,20 @@
 # Mock Server
+For front-end developers who need a quick back-end for Mocking data.
 
-## Usage
+## Features
+- Mocking data
+- Send file
+- URL and method Matching
+- Custom Response time, status and headers
+- Support third-party simulation data lib, like Mock.js and Faker.js
+
+## Getting started
 Clone or download project first.
 将代码下载到本地.
+
 ### 1. Install
+Install project dependencies.
+安装项目依赖.
 ```js
 npm install
 ```
@@ -88,7 +99,7 @@ You could add any js file or folder to '/data' directory.
 }
 ```
 
-### URL Syntax
+## Routes
 ```js
 {
     url: '/user/:name', // matches /user/stephen and /user/ricky
