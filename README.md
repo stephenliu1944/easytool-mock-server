@@ -9,11 +9,11 @@ For front-end developers who need a quick back-end for Mocking data.
 - Support third-party simulation data lib, like Mock.js and Faker.js
 
 ## Getting started
-Clone or download project first.
+Clone or download project first.  
 将代码下载到本地.
 
 ### 1. Install
-Install project dependencies.
+Install project dependencies.  
 安装项目依赖.
 ```js
 npm install
@@ -31,7 +31,7 @@ package.json
 ```
 
 ### 3. Write mock data
-Default mock data path is "/data", you could change it in "/settings.js".
+Default mock data path is "/data", you could change it in "/settings.js".  
 默认的mock数据存放路径为"/data", 你可以在 "/settings.js" 中进行修改.
 ```js
 module.exports = [{
@@ -63,7 +63,7 @@ http://localhost:3000/user/1
 ```
 
 ## Data format
-You could add any js file or folder to '/data' directory.
+You could add any js file or folder to '/data' directory.  
 你可以添加任何js文件或文件夹到"/data"目录, 服务器会递归查询(采用深度优先查找).
 ```js
 {
