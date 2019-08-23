@@ -2,6 +2,7 @@
 
 ## Usage
 Clone or download project first.
+将代码下载到本地.
 ### 1. Install
 ```js
 npm install
@@ -20,6 +21,7 @@ package.json
 
 ### 3. Write mock data
 Default mock data path is "/data", you could change it in "/settings.js".
+默认的mock数据存放路径为"/data", 你可以在 "/settings.js" 中进行修改.
 ```js
 module.exports = [{
     url: '/user/:id',
@@ -50,7 +52,8 @@ http://localhost:3000/user/1
 ```
 
 ## Data format
-You could add any js data file or folder to '/data' directory.
+You could add any js file or folder to '/data' directory.
+你可以添加任何js文件或文件夹到"/data"目录, 服务器会递归查询(采用深度优先查找).
 ```js
 {
     // 'url' is use for compare request url.
