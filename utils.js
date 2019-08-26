@@ -31,7 +31,7 @@ function convertPathSyntaxToReg(pathSyntax) {
 }
 
 function isMatchingData(reqURL, reqMethod, item = {}) {
-    var { url, method } = item;
+    var { url, method } = Object.assign({}, item, item.request);
 
     if (method && method.toLowerCase() !== reqMethod.toLowerCase()) {
         return false;

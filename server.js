@@ -16,7 +16,7 @@ app.use(function(req, res, next) {
 
         setTimeout(function() {
             if (headers) {
-                let resHeaders = Object.assign({}, formatObjectKey(settings.headers), formatObjectKey(headers));
+                let resHeaders = Object.assign({}, formatObjectKey(settings.response.headers), formatObjectKey(headers));
                 res.set(resHeaders);
             }
             res.status(status);

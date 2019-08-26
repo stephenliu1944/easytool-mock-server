@@ -1,6 +1,8 @@
 module.exports = [{
-    url: '/download/:filename',
-    method: 'get',
+    request: {
+        url: '/download/:filename',
+        method: 'get'
+    },
     response: {
         delay: 2000,
         headers: {
