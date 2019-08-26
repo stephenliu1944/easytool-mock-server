@@ -1,7 +1,7 @@
 # Mock Server
 For front-end developers who need a quick back-end for Mocking data.
 
-README: [English](https://github.com/Coding/WebIDE/blob/master/README.md) | [中文](https://github.com/Coding/WebIDE/blob/master/README-zh.md)
+README: [English](https://github.com/stephenliu1944/mock-server/blob/master/README.md) | [简体中文](https://github.com/stephenliu1944/mock-server/blob/master/README-zh_CN.md)
 ## Features
 - Mocking data
 - Mocking file download
