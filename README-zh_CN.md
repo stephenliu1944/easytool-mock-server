@@ -1,5 +1,5 @@
 # Mock Server
-该服务用于快速模拟后端接口数据.
+该服务用于快速生成模拟数据.
 
 README: [English](https://github.com/stephenliu1944/mock-server/blob/master/README.md) | [简体中文](https://github.com/stephenliu1944/mock-server/blob/master/README-zh_CN.md)
 ## 特性
@@ -62,12 +62,12 @@ npm start
 http://localhost:3000/user/1
 ```
 
-## 设置
+## 配置
 ### 数据格式
 可以添加任何js文件或文件夹到"/data"目录, 服务器会递归查询(采用深度优先查找).
 ```js
 {
-    // 用于匹配请求, 根据请求返回对应的响应信息
+    // 'request' 用于匹配请求, 根据请求返回对应的响应信息
     request: {  
         // 'url' 用于对比请求的URL.
         url: '/xxx/xxx',        // 必填
