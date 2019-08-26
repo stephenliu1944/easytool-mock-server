@@ -10,9 +10,11 @@ README: [English](https://github.com/stephenliu1944/mock-server/blob/master/READ
 - 支持第三方数据模拟库, 如 Mock.js 和 Faker.js
 
 ## 安装
+```
 git clone https://github.com/stephenliu1944/mock-server.git
 cd mock-server
 npm install
+```
 
 ## 使用
 ### 1. 设置服务端口号

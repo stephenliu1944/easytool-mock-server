@@ -10,9 +10,11 @@ README: [English](https://github.com/Coding/WebIDE/blob/master/README.md) | [中
 - Support third-party simulation data lib, like Mock.js and Faker.js
 
 ## Install
+```
 git clone https://github.com/stephenliu1944/mock-server.git
 cd mock-server
 npm install
+```
 
 ## Usage
 ### 1. Set mock server port
