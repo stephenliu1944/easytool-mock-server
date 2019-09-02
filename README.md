@@ -125,7 +125,7 @@ You could change default setting in "/settings.js"
     // mock data directory
     dataPath: '/data',              // default
     // store resources directory
-    resourcesPath: '/resources',    // default
+    staticPath: '/static',          // default
     // search order with mock data files.
     sort(filenames) {
         return filenames.sort();    // default

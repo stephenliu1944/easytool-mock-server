@@ -8,9 +8,11 @@ module.exports = {
             'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
         }
     },
-    dataPath: '/data',
-    resourcesPath: '/resources',
-    sort(filenames) {
+    host: 'localhost',
+    port: 3000,
+    dataPath: '/src/data',
+    staticPath: '/src/resources',
+    searchOrder(filenames) {
         return filenames.sort();
     }
 };

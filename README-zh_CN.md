@@ -126,7 +126,7 @@ http://localhost:3000/user/1
     // mock 数据的文件保存目录
     dataPath: '/data',              // 默认
     // 保存响应返回的文件目录
-    resourcesPath: '/resources',    // 默认
+    staticPath: '/static',          // 默认
     // 遍历搜索匹配的 mock 文件的顺序, 默认按字母排序.
     sort(filenames) {
         return filenames.sort();    // 默认

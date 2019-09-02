@@ -66,12 +66,12 @@ function getMatchingData(filePath, url, method) {
     });
 }
 
-function searchMatchingData(url, method, dataPath, sort) {
+function searchMatchingData(url, method, dataPath, searchOrder) {
     var filenames = fs.readdirSync(dataPath);
     
     if (filenames && filenames.length > 0) {
         // 文件排序
-        filenames = sort && sort(filenames) || [];
+        filenames = searchOrder && searchOrder(filenames) || [];
         // 遍历所有 mock 数据
         for (let i = 0; i < filenames.length; i++) {
             let filename = filenames[i];

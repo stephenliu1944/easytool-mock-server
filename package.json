@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Use for mock data.",
   "license": "MIT",
+  "author": "Stephen Liu",
   "repository": {
     "type": "git",
     "url": "https://github.com/stephenliu1944/mock-server"
@@ -11,16 +12,36 @@
   "bugs": {
     "url": "https://github.com/stephenliu1944/mock-server/issues"
   },
+  "keywords": [
+    "server",
+    "fake",
+    "API",
+    "mock",
+    "mocking",
+    "mockjs",
+    "test",
+    "testing",
+    "data"
+  ],
+  "engines": {
+    "node": ">=8"
+  },
+  "main": "./lib/server/index.js",
+  "bin": "./lib/cli/index.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "package": "babel src -d lib"
   },
   "dependencies": {
     "express": "^4.17.1",
-    "nodemon": "^1.19.1"
+    "lodash": "^4.17.15",
+    "nodemon": "^1.19.1",
+    "shelljs": "^0.8.3",
+    "yargs": "^14.0.0"
   },
-  "devEnvironments": {
-    "servers": {
-      "mock": 3000
-    }
+  "devDependencies": {
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5"
   }
 }
