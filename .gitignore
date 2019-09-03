@@ -1,6 +1,7 @@
 ﻿node_modules
 build
 dist
+lib
 bin/*.log
 .idea
 .settings

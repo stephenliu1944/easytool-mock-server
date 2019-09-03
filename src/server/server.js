@@ -1,8 +1,9 @@
+var fs = require('fs');
 var path = require('path');
 var app = require('express')();
 var merge = require('lodash/merge');
 var { formatObjectKey, searchMatchingData } = require('../utils/common');
-var settings = require('../config/settings');
+const defaultSettings = require('./defaults');
 
 function sendResponse(mockResponse, staticPath, res, next) {
     var { delay = 0, status = 200, headers = {}, body } = mockResponse;
@@ -25,20 +26,29 @@ function sendResponse(mockResponse, staticPath, res, next) {
     }, delay);
 }
 
-module.exports = function(options = {}) {
+function launch(options = {}, config = 'mock.config.js') {
+    var settings;
+
+    try{
+        settings = require(path.join(__dirname, config));
+    } catch (e) {
+        console.error('Can not find config file.', e);
+    }
+
     var {
-        dataPath,
-        staticPath,
+        host, 
+        port, 
+        watch,      // TODO: fs.watch
+        sourcePath, 
+        staticPath, 
         response: defaultResponse,
-        searchOrder,
-        host,
-        port
-    } = Object.assign({}, settings, options);
+        searchOrder
+    } = merge({}, defaultSettings, settings, options);
 
     defaultResponse.headers = formatObjectKey(defaultResponse.headers);
 
     app.use(function(req, res, next) {
-        var mockDataPath = path.join(__dirname, dataPath);
+        var mockDataPath = path.join(__dirname, sourcePath);
         // 从 mock data 数据源中找到匹配的数据
         var mockResponse = searchMatchingData(req.path, req.method, mockDataPath, searchOrder);
     
@@ -61,3 +71,5 @@ module.exports = function(options = {}) {
         console.info('Mock Server listening on port ' + port);
     });
 }
+
+module.exports = launch;

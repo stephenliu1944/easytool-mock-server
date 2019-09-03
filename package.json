@@ -1,7 +1,7 @@
 {
   "name": "mock-server",
   "version": "0.1.0",
-  "description": "Use for mock data.",
+  "description": "For front-end developers who need a quick back-end for Mocking data.",
   "license": "MIT",
   "author": "Stephen Liu",
   "repository": {
@@ -27,10 +27,13 @@
     "node": ">=8"
   },
   "main": "./lib/server/index.js",
-  "bin": "./lib/cli/index.js",
+  "bin": {
+    "mock-server": "./lib/cli/index.js"
+  },
   "scripts": {
     "start": "nodemon server.js",
-    "package": "babel src -d lib"
+    "package": "babel src -d lib",
+    "lint:js": "eslint -c .eslintrc.prod.json --fix"
   },
   "dependencies": {
     "express": "^4.17.1",
@@ -42,6 +45,23 @@
   "devDependencies": {
     "@babel/cli": "^7.5.5",
     "@babel/core": "^7.5.5",
-    "@babel/preset-env": "^7.5.5"
+    "@babel/preset-env": "^7.5.5",
+    "babel-eslint": "^10.0.3",
+    "eslint": "^5.6.0",
+    "eslint-config-standard": "^14.1.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "linters": {
+      "src/**/*.{js}": [
+        "npm run lint:js",
+        "git add"
+      ],
+      "ignore": []
+    }
   }
 }
