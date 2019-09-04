@@ -2,7 +2,7 @@
 
 const yargs = require('yargs');
 const pkg = require('../../package.json');
-const server = require('../server/server');
+const server = require('../server');
 
 const argv = yargs
     .usage('mock-server [options] <source>')
@@ -19,10 +19,6 @@ const argv = yargs
             alias: 'w',
             description: 'Watch file(s)'
         },
-        source: {
-            alias: 'S',            
-            description: 'Set data source files directory'
-        },
         static: {
             alias: 's',
             description: 'Set static files directory'
@@ -38,7 +34,7 @@ const argv = yargs
     .version(pkg.version)
     .alias('version', 'v').argv;
 
-server({
+server.startup({
     host: argv.host,
     port: argv.port,
     watch: argv.watch,

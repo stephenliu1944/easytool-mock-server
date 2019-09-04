@@ -67,7 +67,13 @@ function getMatchingData(filePath, url, method) {
 }
 
 function searchMatchingData(url, method, dataPath, searchOrder) {
-    var filenames = fs.readdirSync(dataPath);
+    var filenames;
+    
+    try {
+        filenames = fs.readdirSync(dataPath);
+    } catch (e) {
+        throw('Can not find any source files.');
+    }
     
     if (filenames && filenames.length > 0) {
         // 文件排序

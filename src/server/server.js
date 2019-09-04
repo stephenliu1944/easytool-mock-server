@@ -5,6 +5,22 @@ var merge = require('lodash/merge');
 var { formatContentType, searchMatchingData } = require('../utils/common');
 const defaultSettings = require('./defaults');
 
+function getCustomSettings(configFile) {
+    var settings;
+
+    try {
+        settings = require(configFile);
+    } catch (e) {
+        console.log('Can not find config file.');
+    }
+
+    if (settings && settings.response && settings.response.headers) {
+        settings.response.headers = formatContentType(settings.response.headers);
+    }
+
+    return settings;
+}
+
 function sendResponse(mockResponse, staticPath, res, next) {
     var { delay = 0, status = 200, headers = {}, body } = mockResponse;
 
@@ -26,32 +42,21 @@ function sendResponse(mockResponse, staticPath, res, next) {
     }, delay);
 }
 
-function start(options = {}, config = 'mock.config.js') {
-    var settings;
+function startup(options = {}, config = 'mock.config.js') {
+    var settings = getCustomSettings(config);
 
-    try{
-        settings = require(path.join(__dirname, config));
-    } catch (e) {
-        console.error('Can not find config file.', e);
-    }
-
-    if (settings.response && settings.response.headers) {
-        settings.response.headers = formatContentType(settings.response.headers);
-    }
-    
     var {
         host, 
         port, 
         watch,      // TODO: fs.watch
         sourcePath, 
         staticPath, 
-        response: defaultResponse,
-        searchOrder
+        searchOrder,
+        response: defaultResponse
     } = merge({}, defaultSettings, settings, options);
 
-
     if (!sourcePath) {
-        throw('Please set data source files directory first.');
+        throw('Please set source files directory first.');
     }
 
     app.use(function(req, res, next) {
@@ -61,8 +66,8 @@ function start(options = {}, config = 'mock.config.js') {
     
         if (mockResponse) {
             mockResponse.headers = formatContentType(mockResponse.headers);
-            
-            sendResponse(merge({}, defaultResponse, mockResponse), staticPath, res, next);
+            let response = merge({}, defaultResponse, mockResponse);
+            sendResponse(response, staticPath, res, next);
         } else {
             next();
         }
@@ -79,4 +84,6 @@ function start(options = {}, config = 'mock.config.js') {
     });
 }
 
-module.exports = start;
+module.exports = {
+    startup   
+};

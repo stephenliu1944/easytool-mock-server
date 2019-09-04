@@ -13,8 +13,8 @@ module.exports = {
     },
     host: 'localhost',
     port: 3000,
-    sourcePath: './data',
-    staticPath: './static',
+    // sourcePath: './data',
+    // staticPath: './static',
     watch: false, 
     searchOrder(filenames) {
         return filenames.sort();
