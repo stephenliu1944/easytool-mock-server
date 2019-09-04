@@ -2,7 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var app = require('express')();
 var merge = require('lodash/merge');
-var { formatObjectKey, searchMatchingData } = require('../utils/common');
+var { formatContentType, searchMatchingData } = require('../utils/common');
 const defaultSettings = require('./defaults');
 
 function sendResponse(mockResponse, staticPath, res, next) {
@@ -26,7 +26,7 @@ function sendResponse(mockResponse, staticPath, res, next) {
     }, delay);
 }
 
-function launch(options = {}, config = 'mock.config.js') {
+function start(options = {}, config = 'mock.config.js') {
     var settings;
 
     try{
@@ -35,6 +35,10 @@ function launch(options = {}, config = 'mock.config.js') {
         console.error('Can not find config file.', e);
     }
 
+    if (settings.response && settings.response.headers) {
+        settings.response.headers = formatContentType(settings.response.headers);
+    }
+    
     var {
         host, 
         port, 
@@ -45,7 +49,10 @@ function launch(options = {}, config = 'mock.config.js') {
         searchOrder
     } = merge({}, defaultSettings, settings, options);
 
-    defaultResponse.headers = formatObjectKey(defaultResponse.headers);
+
+    if (!sourcePath) {
+        throw('Please set data source files directory first.');
+    }
 
     app.use(function(req, res, next) {
         var mockDataPath = path.join(__dirname, sourcePath);
@@ -53,7 +60,7 @@ function launch(options = {}, config = 'mock.config.js') {
         var mockResponse = searchMatchingData(req.path, req.method, mockDataPath, searchOrder);
     
         if (mockResponse) {
-            mockResponse.headers = formatObjectKey(mockResponse.headers);
+            mockResponse.headers = formatContentType(mockResponse.headers);
             
             sendResponse(merge({}, defaultResponse, mockResponse), staticPath, res, next);
         } else {
@@ -72,4 +79,4 @@ function launch(options = {}, config = 'mock.config.js') {
     });
 }
 
-module.exports = launch;
+module.exports = start;

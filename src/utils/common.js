@@ -8,7 +8,7 @@ function toBigCamel(str = '') {
     });
 }
 
-function formatObjectKey(obj = {}) {
+function formatContentType(obj = {}) {
     var newObj = {};
     for (let key in obj) {
         newObj[toBigCamel(key)] = obj[key];
@@ -94,6 +94,6 @@ function searchMatchingData(url, method, dataPath, searchOrder) {
 }
 
 module.exports = {
-    formatObjectKey,
+    formatContentType,
     searchMatchingData
 };
