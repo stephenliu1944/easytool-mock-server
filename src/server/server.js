@@ -2,14 +2,14 @@ var fs = require('fs');
 var path = require('path');
 var app = require('express')();
 var merge = require('lodash/merge');
+var defaultSettings = require('./defaults');
 var { formatContentType, searchMatchingData } = require('../utils/common');
-const defaultSettings = require('./defaults');
 
 function getCustomSettings(configFile) {
     var settings;
 
     try {
-        settings = require(configFile);
+        settings = require(path.resolve(configFile));
     } catch (e) {
         console.log('Can not find config file.');
     }
@@ -32,7 +32,7 @@ function sendResponse(mockResponse, staticPath, res, next) {
         if (/\.\w{1,5}$/.test(body)) {
             // 发送文件
             res.sendFile(body, {
-                root: path.join(__dirname, staticPath)
+                root: path.resolve(staticPath)
             }, function(err) {
                 err && next(err);
             });
@@ -53,14 +53,14 @@ function startup(options = {}, config = 'mock.config.js') {
         staticPath, 
         searchOrder,
         response: defaultResponse
-    } = merge({}, defaultSettings, settings, options);
+    } = merge({}, defaultSettings, settings, options);  // 注意: defaultSettings.response.headers 格式
 
     if (!sourcePath) {
         throw('Please set source files directory first.');
     }
 
     app.use(function(req, res, next) {
-        var mockDataPath = path.join(__dirname, sourcePath);
+        var mockDataPath = path.resolve(sourcePath);
         // 从 mock data 数据源中找到匹配的数据
         var mockResponse = searchMatchingData(req.path, req.method, mockDataPath, searchOrder);
     
