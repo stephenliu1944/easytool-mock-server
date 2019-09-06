@@ -33,6 +33,11 @@ function convertPathSyntaxToReg(pathSyntax) {
 function isMatchingData(reqURL, reqMethod, item = {}) {
     var { url, method } = Object.assign({}, item, item.request);
 
+    if (!url) {
+        console.error('The request.url option is required in mock data: ', JSON.stringify(item));
+        throw('request.url option is required.');
+    }
+
     if (method && method.toLowerCase() !== reqMethod.toLowerCase()) {
         return false;
     }
@@ -76,24 +81,26 @@ function searchMatchingData(url, method, dataPath, searchOrder) {
     }
     
     if (filenames && filenames.length > 0) {
+        let matchingData;
         // 文件排序
-        filenames = searchOrder && searchOrder(filenames) || [];
+        if (searchOrder) {
+            filenames = searchOrder(filenames) || [];
+        }
         // 遍历所有 mock 数据
         for (let i = 0; i < filenames.length; i++) {
             let filename = filenames[i];
             let filePath = path.join(dataPath, filename);
             let fileStat = fs.statSync(filePath);
-            
             // 是文件则对比请求与文件中的 mock 数据是否匹配
             if (fileStat.isFile()) {
-                let matchingData = getMatchingData(filePath, url, method);
-                // 如果找到了则返回, 未找到继续递归查找.
-                if (matchingData) {
-                    return matchingData;
-                }
-            // 是目录则继续递归
+                matchingData = getMatchingData(filePath, url, method);
+                // 是目录则继续递归
             } else if (fileStat.isDirectory()) {
-                return searchMatchingData(url, method, filePath);
+                matchingData = searchMatchingData(url, method, filePath);
+            }
+            // 如果找到了则返回, 未找到继续递归查找.
+            if (matchingData) {
+                return matchingData;
             }
         }
     }    

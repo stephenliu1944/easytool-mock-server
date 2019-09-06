@@ -7,9 +7,9 @@ var { formatContentType, searchMatchingData } = require('../utils/common');
 
 function getCustomSettings(configFile) {
     var settings;
-
+    
     try {
-        settings = require(path.resolve(configFile));
+        settings = require(configFile);
     } catch (e) {
         console.log('Can not find config file.');
     }
@@ -32,7 +32,7 @@ function sendResponse(mockResponse, staticPath, res, next) {
         if (/\.\w{1,5}$/.test(body)) {
             // 发送文件
             res.sendFile(body, {
-                root: path.resolve(staticPath)
+                root: staticPath
             }, function(err) {
                 err && next(err);
             });
@@ -43,7 +43,7 @@ function sendResponse(mockResponse, staticPath, res, next) {
 }
 
 function startup(options = {}, config = 'mock.config.js') {
-    var settings = getCustomSettings(config);
+    var settings = getCustomSettings(path.resolve(config));
 
     var {
         host, 
@@ -60,14 +60,16 @@ function startup(options = {}, config = 'mock.config.js') {
     }
 
     app.use(function(req, res, next) {
-        var mockDataPath = path.resolve(sourcePath);
+        var mockDataPath = path.resolve(sourcePath);        
         // 从 mock data 数据源中找到匹配的数据
-        var mockResponse = searchMatchingData(req.path, req.method, mockDataPath, searchOrder);
-    
-        if (mockResponse) {
-            mockResponse.headers = formatContentType(mockResponse.headers);
+        var mockDataItem = searchMatchingData(req.path, req.method, mockDataPath, searchOrder);
+        if (mockDataItem) {
+            let mockResponse = mockDataItem.response;
+            if (mockResponse.headers) {
+                mockResponse.headers = formatContentType(mockResponse.headers);
+            }
             let response = merge({}, defaultResponse, mockResponse);
-            sendResponse(response, staticPath, res, next);
+            sendResponse(response, path.resolve(staticPath), res, next);
         } else {
             next();
         }
