@@ -32,7 +32,8 @@ const argv = yargs
     .help('help')
     .alias('help', 'h')
     .version(pkg.version)
-    .alias('version', 'v').argv;
+    .alias('version', 'v')
+    .require(1, 'Missing <source> argument').argv;
 
 server.startup({
     host: argv.host,
