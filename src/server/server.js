@@ -101,6 +101,7 @@ function startup(options = {}, config) {
 
     if (watch) {
         watchDirectories([config, sourcePath, staticPath], () => {
+            // TODO: diff(), 是否有变化, 没变化不重启
             server && server.destroy();
             watcherList.forEach((watcher) => watcher.close());
             watcherList.length = 0;
