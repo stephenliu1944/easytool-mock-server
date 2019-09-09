@@ -1,4 +1,4 @@
-# Mock Server
+# Mock Serve
 For front-end developers who need a quick back-end for Mocking data.
 
 README: [English](https://github.com/stephenliu1944/mock-server/blob/master/README.md) | [简体中文](https://github.com/stephenliu1944/mock-server/blob/master/README-zh_CN.md)
@@ -6,30 +6,17 @@ README: [English](https://github.com/stephenliu1944/mock-server/blob/master/READ
 - Mocking data
 - Mocking file download
 - Matching by request URL and method
-- Custom Response time, status and headers
+- Custom Response delay, status and headers
 - Support third-party simulation data lib, like Mock.js and Faker.js
 
 ## Install
 ```
-git clone https://github.com/stephenliu1944/mock-server.git
-cd mock-server
-npm install
+npm i -g mock-serve
 ```
 
 ## Usage
-### 1. Set mock server port
-package.json
-```js
-"devEnvironments": {
-    "servers": {
-        "mock": 3000    // default
-    },
-    ...
-},
-```
-
-### 2. Write mock data
-Default mock data path is "/data", you could change it in "/settings.js".  
+### 1. Write mock data in source directory
+data/user.js
 ```js
 module.exports = [{
     request: {
@@ -45,14 +32,9 @@ module.exports = [{
 }];
 ```
 
-### 3. Start mock server
+### 2. Start mock serve
 ```js
-npm start
-```
-Or run
-```js
-/bin/start.bat   // Windows
-/bin/start.sh    // Linux
+mock-serve ./data
 ```
 
 ### 4. Request URL
@@ -60,9 +42,21 @@ Or run
 http://localhost:3000/user/1
 ```
 
+## CLI 
+```js
+mock-serve [options] <source>
+
+Options:
+  --config, -c       Path to config file
+  --port, -p         Set port                                    [default: 3000]
+  --host, -H         Set host                             [default: "localhost"]
+  --watch, -w        Watch file(s)                                     [boolean]
+  --static, -s       Set static(download) files directory
+```
+
 ## Config
 ### Data format
-You could add any js file or folder to '/data' directory.  
+You could add any js file or folder to source directory.  
 ```js
 {
     // 'request' is use for matching response data
@@ -94,6 +88,7 @@ You could add any js file or folder to '/data' directory.
 ```
 
 ### Routes
+There are three pattern to match request url.
 ```js
 {
     request: {
@@ -109,7 +104,12 @@ You could add any js file or folder to '/data' directory.
 ```
 
 ### Default Settings
-You could change default setting in "/settings.js"  
+You could configure default setting in config file.
+```js
+mock-serve ./data --config=mock.config.js
+```
+
+mock.config.js
 ```js
 {
     // global response settings
@@ -156,9 +156,13 @@ module.exports = [{
     }
 }];
 ```
+```js
+mock-serve ./data
+```
 
 ### Mocking file download
 POST http://localhost:3000/download/sample
+./data
 ```js
 module.exports = [{
     request: {
@@ -171,9 +175,13 @@ module.exports = [{
             'Content-Type': 'text/plain',
             'Content-Disposition': 'attachment;filename=sample.txt;'
         },
-        body: 'sample.txt'      // file need to save in '/resources' directory.
+        body: 'sample.txt'      // store download file sample.txt to "./static" directory.
     }
 }];
+```
+
+```js
+mock-serve ./data --static=./static
 ```
 
 ### Work with Mock.js

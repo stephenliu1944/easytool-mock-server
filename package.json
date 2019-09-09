@@ -1,6 +1,6 @@
 {
-  "name": "mock-server",
-  "version": "0.1.0",
+  "name": "mock-serve",
+  "version": "0.1.0-alpha.1",
   "description": "For front-end developers who need a quick back-end for Mocking data.",
   "license": "MIT",
   "author": "Stephen Liu",
@@ -28,10 +28,9 @@
   },
   "main": "./lib/server/index.js",
   "bin": {
-    "mock-server": "./lib/cli/index.js"
+    "mock-serve": "./lib/cli/index.js"
   },
   "scripts": {
-    "start": "nodemon server.js",
     "test": "node ./test/server/index.js",
     "package": "babel src -d lib",
     "lint:js": "eslint -c .eslintrc.prod.json --fix"
