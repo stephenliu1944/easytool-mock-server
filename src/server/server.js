@@ -1,18 +1,18 @@
 var fs = require('fs');
-var path = require('path');
 var app = require('express')();
 var merge = require('lodash/merge');
+var enableDestroy = require('server-destroy');
 var defaultSettings = require('./defaults');
-var { formatContentType, searchMatchingData } = require('../utils/common');
+var { formatContentType, searchMatchingItem } = require('../utils/common');
 
-function getCustomSettings(configFile) {
-    var settings;
-    
-    try {
-        settings = require(configFile);
-    } catch (e) {
-        console.log('Can not find config file.');
+const watcherList = [];
+
+function getSettings(configFile) {
+    if (!fs.existsSync(configFile)) {
+        return;
     }
+
+    var settings = require(configFile);
 
     if (settings && settings.response && settings.response.headers) {
         settings.response.headers = formatContentType(settings.response.headers);
@@ -30,6 +30,8 @@ function sendResponse(mockResponse, staticPath, res, next) {
 
         // body 类型为 string 并且以 .xxx 结尾( 1 <= x <= 5), 代表是文件路径.
         if (/\.\w{1,5}$/.test(body)) {
+            // 1. TODO: staticPath 如果没有配置则抛出错误
+            // 2. TODO: 支持远程文件传输
             // 发送文件
             res.sendFile(body, {
                 root: staticPath
@@ -42,50 +44,74 @@ function sendResponse(mockResponse, staticPath, res, next) {
     }, delay);
 }
 
-function startup(options = {}, config = 'mock.config.js') {
-    var settings = getCustomSettings(path.resolve(config));
+function watchDirectories(directories = [], callback) {
+    directories.forEach((dir) => {
+        if (fs.existsSync(dir)) {
+            var watcher = fs.watch(dir, (eventType, filename) => {
+                console.log('eventType: ', eventType, filename);
+                callback && callback();
+            });
+            watcherList.push(watcher);
+        }
+    });
+}
 
-    var {
+function startup(options = {}, config) {
+    const {
         host, 
         port, 
-        watch,      // TODO: fs.watch
+        watch,      
         sourcePath, 
         staticPath, 
         searchOrder,
         response: defaultResponse
-    } = merge({}, defaultSettings, settings, options);  // 注意: defaultSettings.response.headers 格式
+    } = merge({}, defaultSettings, getSettings(config), options);  // 注意: defaultSettings.response.headers 格式
 
     if (!sourcePath) {
-        throw('Please set source files directory first.');
+        throw('sourcePath option is required.');
     }
 
     app.use(function(req, res, next) {
-        var mockDataPath = path.resolve(sourcePath);        
         // 从 mock data 数据源中找到匹配的数据
-        var mockDataItem = searchMatchingData(req.path, req.method, mockDataPath, searchOrder);
+        var mockDataItem = searchMatchingItem(req.path, req.method, sourcePath, searchOrder);
         if (mockDataItem) {
             let mockResponse = mockDataItem.response;
             if (mockResponse.headers) {
                 mockResponse.headers = formatContentType(mockResponse.headers);
             }
             let response = merge({}, defaultResponse, mockResponse);
-            sendResponse(response, path.resolve(staticPath), res, next);
+            sendResponse(response, staticPath, res, next);
         } else {
             next();
         }
     });
     
     app.use(function(err, req, res, next) {
-        console.log(req.url, 404);
+        console.log(req.url, 404, err);
         res.status(404);
         res.send(err.message);
     });
     
-    return app.listen(port, host, function() {
+    var server = app.listen(port, host, function() {
         console.info('Mock Server listening on port ' + port);
     });
+
+    // enhance with a 'destroy' function
+    enableDestroy(server);
+
+    if (watch) {
+        watchDirectories([config, sourcePath, staticPath], () => {
+            server && server.destroy();
+            watcherList.forEach((watcher) => watcher.close());
+            watcherList.length = 0;
+
+            startup(options, config);
+        });
+    }
+
+    return server;
 }
 
 module.exports = {
-    startup   
+    startup
 };

@@ -1,6 +1,8 @@
+const path = require('path');
 var server = require('../../src/server');
 
 server.startup({
-    sourcePath: '../data',
-    staticPath: '../static'
-});
+    watch: true,
+    sourcePath: path.resolve(__dirname, '../data'),
+    staticPath: path.resolve(__dirname, '../static')
+}, path.resolve(__dirname, '../mock.config.js'));

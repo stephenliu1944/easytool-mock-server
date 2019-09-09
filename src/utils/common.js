@@ -59,7 +59,7 @@ function isMatchingData(reqURL, reqMethod, item = {}) {
     return false;
 }
 
-function getMatchingData(filePath, url, method) {
+function getMatchingItem(filePath, url, method) {
     let mockData = require(filePath) || [];
 
     if (typeof mockData === 'object' && !Array.isArray(mockData)) {
@@ -71,7 +71,7 @@ function getMatchingData(filePath, url, method) {
     });
 }
 
-function searchMatchingData(url, method, dataPath, searchOrder) {
+function searchMatchingItem(url, method, dataPath, searchOrder) {
     var filenames;
     
     try {
@@ -93,10 +93,10 @@ function searchMatchingData(url, method, dataPath, searchOrder) {
             let fileStat = fs.statSync(filePath);
             // 是文件则对比请求与文件中的 mock 数据是否匹配
             if (fileStat.isFile()) {
-                matchingData = getMatchingData(filePath, url, method);
+                matchingData = getMatchingItem(filePath, url, method);
                 // 是目录则继续递归
             } else if (fileStat.isDirectory()) {
-                matchingData = searchMatchingData(url, method, filePath);
+                matchingData = searchMatchingItem(url, method, filePath);
             }
             // 如果找到了则返回, 未找到继续递归查找.
             if (matchingData) {
@@ -108,5 +108,5 @@ function searchMatchingData(url, method, dataPath, searchOrder) {
 
 module.exports = {
     formatContentType,
-    searchMatchingData
+    searchMatchingItem
 };

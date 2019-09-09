@@ -32,6 +32,7 @@
   },
   "scripts": {
     "start": "nodemon server.js",
+    "test": "node ./test/server/index.js",
     "package": "babel src -d lib",
     "lint:js": "eslint -c .eslintrc.prod.json --fix"
   },
@@ -39,6 +40,7 @@
     "express": "^4.17.1",
     "lodash": "^4.17.15",
     "nodemon": "^1.19.1",
+    "server-destroy": "^1.0.1",
     "shelljs": "^0.8.3",
     "yargs": "^14.0.0"
   },

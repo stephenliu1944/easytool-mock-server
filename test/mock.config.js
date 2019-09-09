@@ -1,7 +1,7 @@
 module.exports = {
     response: {
         headers: {
-            'ABC': '11111111'
+            'ABC': '123'
         }
     }
 };

@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
+const path = require('path');
 const yargs = require('yargs');
 const pkg = require('../../package.json');
 const server = require('../server');
 
-const argv = yargs
+const { _, host, port, watch, static: staticPath, config } = yargs
     .usage('mock-server [options] <source>')
     .options({
         host: {
@@ -26,6 +27,7 @@ const argv = yargs
         config: {
             alias: 'c',
             description: 'Path to config file'
+            // default: 'mock.config.js'
         }
     })
     .boolean('watch')
@@ -36,9 +38,9 @@ const argv = yargs
     .require(1, 'Missing <source> argument').argv;
 
 server.startup({
-    host: argv.host,
-    port: argv.port,
-    watch: argv.watch,
-    sourcePath: argv._[0],
-    staticPath: argv.static
-}, argv.config);
+    host: host,
+    port: port,
+    watch: watch,
+    sourcePath: _[0] ? path.resolve(_[0]) : undefined,
+    staticPath: staticPath ? path.resolve(staticPath) : undefined
+}, config ? path.resolve(config) : undefined);
