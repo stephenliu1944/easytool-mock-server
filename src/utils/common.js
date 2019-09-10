@@ -30,54 +30,62 @@ function convertPathSyntaxToReg(pathSyntax) {
     return eval('/^' + reg + '$/');             // 字符串转化为正则表达式
 }
 
-function isMatchingData(reqURL, reqMethod, item = {}) {
-    var { url, method } = Object.assign({}, item, item.request);
+function isMatchingItem(req = {}, item = {}) {
+    var { url: itemURL, method: itemMethod, protocol: itemProtocol, headers: itemHeaders } = Object.assign({}, item, item.request);
+    var { path: reqURL, method: reqMethod, protocol: reqProtocol, headers: reqHeaders } = req;
 
-    if (!url) {
-        console.error('The request.url option is required in mock data: ', JSON.stringify(item));
-        throw('request.url option is required.');
+    if (!itemURL) {
+        throw(`Missing "url" option in ${JSON.stringify(item)}.`);
     }
 
-    if (method && method.toLowerCase() !== reqMethod.toLowerCase()) {
+    reqURL = reqURL.replace(/^\//, '').replace(/\/$/, '');          // 移除开头和末尾的 "/"
+    itemURL = itemURL.replace(/^\//, '').replace(/\/$/, '');        // 移除开头和末尾的 "/"
+    var reg = convertPathSyntaxToReg(itemURL);
+    
+    // 对比 url
+    if (reqURL.toLowerCase() !== itemURL.toLowerCase() && !reg.test(reqURL)) {
         return false;
     }
 
-    // 移除开头和末尾的 "/"
-    reqURL = reqURL.replace(/^\//, '')
-        .replace(/\/$/, '');
-    // 移除开头和末尾的 "/"
-    url = url.replace(/^\//, '')
-        .replace(/\/$/, '');
-
-    var reg = convertPathSyntaxToReg(url);
-
-    if (reqURL.toLowerCase() === url.toLowerCase() 
-            || reg.test(reqURL)) {
-        return true;
+    // 对比 method
+    if (itemMethod && itemMethod.toLowerCase() !== reqMethod.toLowerCase()) {
+        return false;
     }
 
-    return false;
+    // 对比 protocol
+    if (itemProtocol && itemProtocol.toLowerCase() !== reqProtocol.toLowerCase()) {
+        return false;
+    }
+
+    // TODO: 对比 headers
+    /* 
+    if (itemHeaders && reqHeaders) {
+        Object.keys(reqHeaders).some();
+    } 
+    */
+
+    return true;
 }
 
-function getMatchingItem(filePath, url, method) {
+function getMatchingItem(req, filePath) {
+    // 清除缓存
+    delete require.cache[filePath];
     let mockData = require(filePath) || [];
 
     if (typeof mockData === 'object' && !Array.isArray(mockData)) {
         mockData = [mockData];
     }
 
-    return mockData.find((data) => {
-        return isMatchingData(url, method, data);
-    });
+    return mockData.find(item => isMatchingItem(req, item));
 }
 
-function searchMatchingItem(url, method, dataPath, searchOrder) {
+function searchMatchingItem(req, sourcePath, searchOrder) {
     var filenames;
     
     try {
-        filenames = fs.readdirSync(dataPath);
+        filenames = fs.readdirSync(sourcePath);
     } catch (e) {
-        throw('Can not find any source files.');
+        throw(`Can not find any source files in "${sourcePath}".`);
     }
     
     if (filenames && filenames.length > 0) {
@@ -89,14 +97,14 @@ function searchMatchingItem(url, method, dataPath, searchOrder) {
         // 遍历所有 mock 数据
         for (let i = 0; i < filenames.length; i++) {
             let filename = filenames[i];
-            let filePath = path.join(dataPath, filename);
+            let filePath = path.join(sourcePath, filename);
             let fileStat = fs.statSync(filePath);
             // 是文件则对比请求与文件中的 mock 数据是否匹配
             if (fileStat.isFile()) {
-                matchingData = getMatchingItem(filePath, url, method);
+                matchingData = getMatchingItem(req, filePath);
                 // 是目录则继续递归
             } else if (fileStat.isDirectory()) {
-                matchingData = searchMatchingItem(url, method, filePath);
+                matchingData = searchMatchingItem(req, filePath, searchOrder);
             }
             // 如果找到了则返回, 未找到继续递归查找.
             if (matchingData) {
