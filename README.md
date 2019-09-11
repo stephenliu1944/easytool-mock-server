@@ -1,21 +1,21 @@
-# Mock Serve
-For front-end developers who need a quick back-end for Mocking data.
+# fake-http
+For front-end developers who need a quick back-end for fake data.
 
 README: [English](https://github.com/stephenliu1944/mock-server/blob/master/README.md) | [简体中文](https://github.com/stephenliu1944/mock-server/blob/master/README-zh_CN.md)
 ## Features
-- Mocking data
-- Mocking file download
+- fake data
+- fake file download
 - Matching by request URL and method
 - Custom Response delay, status and headers
 - Support third-party simulation data lib, like Mock.js and Faker.js
 
 ## Install
 ```
-npm i -g mock-serve
+npm install -D fake-http
 ```
 
 ## Usage
-### 1. Write mock data in source directory
+### 1. Write fake data in source directory
 data/user.js
 ```js
 module.exports = [{
@@ -32,31 +32,31 @@ module.exports = [{
 }];
 ```
 
-### 2. Start mock serve
+### 2. Start fake server
 ```js
-mock-serve ./data
+fake-http ./data
 ```
 
-### 4. Request URL
+### 3. Request URL
 ```js
 http://localhost:3000/user/1
 ```
 
 ## CLI 
 ```js
-mock-serve [options] <source>
+fake-http [options] <source>
 
 Options:
   --config, -c       Path to config file
-  --port, -p         Set port                                    [default: 3000]
   --host, -H         Set host                             [default: "localhost"]
+  --port, -p         Set port                                    [default: 3000]
   --watch, -w        Watch file(s)                                     [boolean]
   --static, -s       Set static(download) files directory
 ```
 
 ## Config
 ### Data format
-You could add any js file or folder to source directory.  
+You could add any js file or folder to source directory. Nested files are supported and use DFS.
 ```js
 {
     // 'request' is use for matching response data
@@ -64,7 +64,8 @@ You could add any js file or folder to source directory.
         // 'url' is use for compare request url.
         url: '/xxx/xxx',        // require
         // 'method' is use for compare request method.
-        method: 'get'           // optional
+        method: 'get',          // optional
+        protocol: 'http'        // optional
     },
     // 'response' is use for set response data
     response: {             // require
@@ -74,15 +75,43 @@ You could add any js file or folder to source directory.
         status: 200,        // default
         // 'headers' use for set response header. default to below.
         headers: {          // default
-            'Mock-Data': 'true',
+            'Fake-Data': 'true',
             'Content-Type': 'application/json; charset=UTF-8',
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
         },
-        // 'body' is use for set response body, string, object and array are supported, if type to String and end with '.xxx' means this is a file path and default root path is "/resources", you can change it in "/settings.js".
+        // 'body' is use for set response body, string, object and array are supported, if type to String and end with '.xxx' means this is a file path and root path is by --static argument, you can change it in default setting with "staticPath" option.
         body: {             // require
             ...
         }
+    }
+}
+```
+
+### Default Settings
+You could configure default setting in config file.
+```js
+fake-http ./data --config=fake.config.js
+```
+
+fake.config.js
+```js
+{
+    // global response settings
+    response: {
+        // will merge to your specific response headers.
+        headers: {                      // default
+            'Fake-Data': 'true',
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+        }
+    },
+    // store resources directory
+    staticPath: '/static',          // default
+    // search order with fake data files.
+    searchOrder(filenames) {
+        return filenames.sort();    // default
     }
 }
 ```
@@ -103,38 +132,8 @@ There are three pattern to match request url.
 }
 ```
 
-### Default Settings
-You could configure default setting in config file.
-```js
-mock-serve ./data --config=mock.config.js
-```
-
-mock.config.js
-```js
-{
-    // global response settings
-    response: {
-        // will merge to your specific response headers.
-        headers: {                      // default
-            'Mock-Data': 'true',
-            'Content-Type': 'application/json; charset=UTF-8',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
-        }
-    },
-    // mock data directory
-    dataPath: '/data',              // default
-    // store resources directory
-    staticPath: '/static',          // default
-    // search order with mock data files.
-    sort(filenames) {
-        return filenames.sort();    // default
-    }
-}
-```
-
 ## Example
-### Mocking data
+### Fake data
 GET http://localhost:3000/user/list
 ```js
 module.exports = [{
@@ -157,10 +156,10 @@ module.exports = [{
 }];
 ```
 ```js
-mock-serve ./data
+fake-http ./data
 ```
 
-### Mocking file download
+### Fake file download
 POST http://localhost:3000/download/sample
 ./data
 ```js
@@ -175,13 +174,13 @@ module.exports = [{
             'Content-Type': 'text/plain',
             'Content-Disposition': 'attachment;filename=sample.txt;'
         },
-        body: 'sample.txt'      // store download file sample.txt to "./static" directory.
+        body: 'sample.txt'      // store download file sample.txt to static directory(use --static argument to set).
     }
 }];
 ```
 
 ```js
-mock-serve ./data --static=./static
+fake-http ./data --static=./static
 ```
 
 ### Work with Mock.js

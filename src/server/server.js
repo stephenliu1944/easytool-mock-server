@@ -4,7 +4,7 @@ var app = require('express')();
 var merge = require('lodash/merge');
 var enableDestroy = require('server-destroy');
 var defaultSettings = require('./defaults');
-var { formatContentType, searchMatchingItem } = require('../utils/common');
+var { formatContentType, searchMatchingItem } = require('./utils');
 
 const watcherList = [];
 
@@ -111,7 +111,7 @@ function startup(options = {}, config) {
     });
     
     var server = app.listen(port, host, function() {
-        console.info('Mock Server listening on port ' + port);
+        console.info('Fake Server listening on port ' + port);
     });
 
     // enhance with a 'destroy' function

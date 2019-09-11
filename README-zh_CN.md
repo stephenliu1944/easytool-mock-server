@@ -1,5 +1,5 @@
-# Mock Server
-该服务用于快速生成模拟数据.
+# fake-http
+该服务用于快速模拟HTTP请求数据.
 
 README: [English](https://github.com/stephenliu1944/mock-server/blob/master/README.md) | [简体中文](https://github.com/stephenliu1944/mock-server/blob/master/README-zh_CN.md)
 ## 特性
@@ -11,32 +11,17 @@ README: [English](https://github.com/stephenliu1944/mock-server/blob/master/READ
 
 ## 安装
 ```
-git clone https://github.com/stephenliu1944/mock-server.git
-cd mock-server
-npm install
+npm install -D fake-http
 ```
 
-## 使用
-### 1. 设置服务端口号
-package.json
-```js
-"devEnvironments": {
-    "servers": {
-        "mock": 3000    // 默认
-    },
-    ...
-},
-```
-
-### 2. 设置模拟数据
-默认的 mock 数据存放路径为 "/data", 可以在 "/settings.js" 中进行修改.
+## 示例
+### 1. 在存放模拟数据的目录中配置模拟数据
+data/user.js
 ```js
 module.exports = [{
-    // 根据请求条件匹配响应信息
     request: {
         url: '/user/:id'
     },
-    // 用于返回的响应信息
     response: {
         body: {
             id: 123,
@@ -47,24 +32,32 @@ module.exports = [{
 }];
 ```
 
-### 3. 启动服务
+### 2. 启动服务
+"./data"参数为模拟数据所在目录
 ```js
-npm start
-```
-或执行
-```js
-/bin/start.bat   // Windows
-/bin/start.sh    // Linux
+fake-http ./data
 ```
 
-### 4. 请求URL
+### 3. 请求 URL
 ```js
 http://localhost:3000/user/1
 ```
 
+## 命令行
+```js
+fake-http [options] <source>
+
+Options:
+  --config, -c       配置文件所在路径
+  --host, -H         设置主机                              [default: "localhost"]
+  --port, -p         设置端口号                                   [default: 3000]
+  --watch, -w        是否监听文件变化                                    [boolean]
+  --static, -s       设置静态资源(下载)文件路径
+```
+
 ## 配置
 ### 数据格式
-可以添加任何js文件或文件夹到"/data"目录, 服务器会递归查询(采用深度优先查找).
+可以将任何js文件添加到数据文件目录中, 支持文件嵌套, 服务器会递归查询(采用深度优先查找).
 ```js
 {
     // 'request' 用于匹配请求, 根据请求返回对应的响应信息
@@ -72,7 +65,8 @@ http://localhost:3000/user/1
         // 'url' 用于对比请求的URL.
         url: '/xxx/xxx',        // 必填
         // 'method' 用于 对比请求的方法, 不填则不会对比该项.
-        method: 'get'           // 可选
+        method: 'get',          // 可选
+        protocol: 'http'        // 可选
     },
     // 'response' 用于配置响应返回的信息.
     response: {             // 必填
@@ -82,12 +76,12 @@ http://localhost:3000/user/1
         status: 200,        // 默认
         // 'headers' 用于设置响应的头信息, 下方是默认配置.
         headers: {          // 默认
-            'Mock-Data': 'true',
+            'Fake-Data': 'true',
             'Content-Type': 'application/json; charset=UTF-8',
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
         },
-        // 'body' 用于配置响应的实体信息, 支持 string, object, array类型, 如果类型为 String 并且以 '.xxx' 后缀结尾, 则表示该配置项为一个文件路径, 且默认根目录为 "/resources",该功能用于返回文件, 可以在 "/settings.js" 中修改默认配置.
+        // 'body' 用于配置响应的实体信息, 支持 string, object, array类型, 如果类型为 String 并且以 '.xxx' 后缀结尾, 则表示该配置项为一个文件路径, 且默认根目录为 "--static" 参数的值,该功能用于返回文件, 可以在默认设置文件中修改 "staticPath" 配置.
         body: {             // 必填
             ...
         }
@@ -95,7 +89,35 @@ http://localhost:3000/user/1
 }
 ```
 
+### 默认设置
+可以在配置文件中修改默认配置.
+```js
+fake-http ./data --config=fake.config.js
+```
+
+fake.config.js
+```js
+{
+    // 全局的响应配置, 会合并到你指定的某个具体的响应配置上.
+    response: {
+        headers: {                      // 默认
+            'Fake-Data': 'true',
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+        }
+    },
+    // 保存响应返回的文件目录
+    staticPath: '/static',          // 默认
+    // 遍历搜索匹配的 mock 文件的顺序, 默认按字母排序.
+    searchOrder(filenames) {
+        return filenames.sort();    // 默认
+    }
+}
+```
+
 ### 路由
+有三种模式可以匹配请求的URL.
 ```js
 {
     request: {
@@ -107,30 +129,6 @@ http://localhost:3000/user/1
         url: '/**/*.jpg'
     },
     ...
-}
-```
-
-### 默认设置
-可以在 "/settings.js" 中修改默认配置.
-```js
-{
-    // 全局的响应配置, 会合并到你指定的某个具体的响应配置上.
-    response: {
-        headers: {                      // 默认
-            'Mock-Data': 'true',
-            'Content-Type': 'application/json; charset=UTF-8',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
-        }
-    },
-    // mock 数据的文件保存目录
-    dataPath: '/data',              // 默认
-    // 保存响应返回的文件目录
-    staticPath: '/static',          // 默认
-    // 遍历搜索匹配的 mock 文件的顺序, 默认按字母排序.
-    sort(filenames) {
-        return filenames.sort();    // 默认
-    }
 }
 ```
 
@@ -172,7 +170,7 @@ module.exports = [{
             'Content-Type': 'text/plain',
             'Content-Disposition': 'attachment;filename=sample.txt;'
         },
-        body: 'sample.txt'      // 需要将模拟下载的文件保存在 '/resources' 目录中.
+        body: 'sample.txt'      // 需要将模拟下载的文件保存在静态资源(static参数配置的)目录中.
     }
 }];
 ```

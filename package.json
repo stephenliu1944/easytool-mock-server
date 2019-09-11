@@ -1,7 +1,7 @@
 {
-  "name": "mock-serve",
-  "version": "0.1.0-alpha.1",
-  "description": "For front-end developers who need a quick back-end for Mocking data.",
+  "name": "fake-http",
+  "version": "0.1.0",
+  "description": "For front-end developers who need a quick back-end for fake data.",
   "license": "MIT",
   "author": "Stephen Liu",
   "repository": {
@@ -28,7 +28,7 @@
   },
   "main": "./lib/server/index.js",
   "bin": {
-    "mock-serve": "./lib/cli/index.js"
+    "fake-http": "./lib/cli/index.js"
   },
   "scripts": {
     "test": "node ./test/server/index.js",

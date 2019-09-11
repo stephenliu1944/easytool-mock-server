@@ -5,4 +5,4 @@ server.startup({
     watch: true,
     sourcePath: path.resolve(__dirname, '../data'),
     staticPath: path.resolve(__dirname, '../static')
-}, path.resolve(__dirname, '../mock.config.js'));
+}, path.resolve(__dirname, '../fake.config.js'));
