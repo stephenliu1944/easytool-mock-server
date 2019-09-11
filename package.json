@@ -1,6 +1,6 @@
 {
   "name": "fake-http",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "For front-end developers who need a quick back-end for fake data.",
   "main": "lib/server/index.js",
   "bin": {

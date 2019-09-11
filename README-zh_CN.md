@@ -1,7 +1,7 @@
 # fake-http
 该服务用于快速模拟HTTP请求数据.
 
-README: [English](https://github.com/stephenliu1944/mock-server/blob/master/README.md) | [简体中文](https://github.com/stephenliu1944/mock-server/blob/master/README-zh_CN.md)
+README: [English](https://github.com/stephenliu1944/mock-server/blob/dev/README.md) | [简体中文](https://github.com/stephenliu1944/mock-server/blob/dev/README-zh_CN.md)
 ## 特性
 - 模拟数据
 - 模拟文件下载
@@ -11,7 +11,7 @@ README: [English](https://github.com/stephenliu1944/mock-server/blob/master/READ
 
 ## 安装
 ```
-npm install -D fake-http
+npm install -g fake-http
 ```
 
 ## 示例

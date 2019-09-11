@@ -1,7 +1,7 @@
 # fake-http
 For front-end developers who need a quick back-end for fake data.
 
-README: [English](https://github.com/stephenliu1944/mock-server/blob/master/README.md) | [简体中文](https://github.com/stephenliu1944/mock-server/blob/master/README-zh_CN.md)
+README: [English](https://github.com/stephenliu1944/mock-server/blob/dev/README.md) | [简体中文](https://github.com/stephenliu1944/mock-server/blob/dev/README-zh_CN.md)
 ## Features
 - fake data
 - fake file download
@@ -11,7 +11,7 @@ README: [English](https://github.com/stephenliu1944/mock-server/blob/master/READ
 
 ## Install
 ```
-npm install -D fake-http
+npm install -g fake-http
 ```
 
 ## Usage
