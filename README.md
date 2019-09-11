@@ -75,7 +75,6 @@ You could add any js file or folder to source directory. Nested files are suppor
         status: 200,        // default
         // 'headers' use for set response header. default to below.
         headers: {          // default
-            'Fake-Data': 'true',
             'Content-Type': 'application/json; charset=UTF-8',
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
@@ -112,7 +111,6 @@ module.exports = {
     response: {
         // will merge to your specific response headers.
         headers: {                      // default
-            'Fake-Data': 'true',
             'Content-Type': 'application/json; charset=UTF-8',
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'

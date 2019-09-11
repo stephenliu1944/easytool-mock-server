@@ -1,5 +1,6 @@
 var fs = require('fs');
 var path = require('path');
+var requireS = require('require-from-string');
 
 // 'content-type' to 'Content-Type'
 function toBigCamel(str = '') {
@@ -68,9 +69,8 @@ function isMatchingItem(req = {}, item = {}) {
 }
 
 function getMatchingItem(req, filePath) {
-    // 清除缓存
-    delete require.cache[filePath];
-    let mockData = require(filePath) || [];
+    // 不直接使用 require() 为避免缓存
+    let mockData = requireS(fs.readFileSync(filePath, 'utf-8')) || [];
 
     if (typeof mockData === 'object' && !Array.isArray(mockData)) {
         mockData = [mockData];

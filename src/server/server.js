@@ -1,21 +1,20 @@
 var fs = require('fs');
 var path = require('path');
+var requireS = require('require-from-string');
 var app = require('express')();
 var merge = require('lodash/merge');
 var enableDestroy = require('server-destroy');
 var defaultSettings = require('./defaults');
 var { formatContentType, searchMatchingItem } = require('./utils');
 
-const watcherList = [];
+var watcherList = [];
 
 function getSettings(configFile) {
     if (!fs.existsSync(configFile)) {
         return;
     }
-
-    // 清除缓存
-    delete require.cache[configFile];
-    var settings = require(configFile);
+    // 不直接使用 require() 为避免缓存
+    var settings = requireS(fs.readFileSync(configFile, 'utf-8'));
 
     if (settings && settings.response && settings.response.headers) {
         settings.response.headers = formatContentType(settings.response.headers);
@@ -63,22 +62,20 @@ function watchDirectories(directories = [], callback) {
 }
 
 function startup(options = {}, config) {
-    const { sourcePath, ...other }  = options;
+    var { sourcePath, ...other } = options;
     
     if (!sourcePath) {
         throw('sourcePath option is required.');
     }
 
-    const {
-        host, 
-        port, 
-        watch,      
-        staticPath, 
-        searchOrder,
-        response: defaultResponse
-    } = merge({}, defaultSettings, getSettings(config), other);  // 注意: defaultSettings.response.headers 格式
+    // 注意: defaultSettings.response.headers 格式需要大写开头
+    var _options = merge({}, defaultSettings, getSettings(config), other);
+    var { host, port, watch, staticPath } = _options;  
+    app.set('options', _options);
 
     app.use(function(req, res, next) {
+        var { staticPath: _staticPath, searchOrder, response: defaultResponse } = app.get('options');
+
         try {
             var error;
             // 从 mock data 数据源中找到匹配的数据
@@ -89,7 +86,7 @@ function startup(options = {}, config) {
                     mockResponse.headers = formatContentType(mockResponse.headers);
                 }
                 let response = merge({}, defaultResponse, mockResponse);
-                sendResponse(response, staticPath, res, next);
+                sendResponse(response, _staticPath, res, next);
             } else {
                 error = new Error(`No matching data could be found.`);
                 error.status = 404;
@@ -106,9 +103,14 @@ function startup(options = {}, config) {
             error = new Error(error);
             error.status = 500;
         }
-
-        console.log(req.url, error.status);
+        
+        console.info(req.url, error.status);
         console.error(error.message);
+
+        res.set({
+            'Content-Type': 'text/plain',
+            'Content-Disposition': 'inline'
+        });
         res.status(error.status);
         res.send(error.message);
     });
@@ -125,9 +127,7 @@ function startup(options = {}, config) {
             // TODO: diff(filename), 是否有变化, 没变化不重启, 提高性能
             watcherList.forEach(watcher => watcher.close());
             watcherList.length = 0;
-            server && server.destroy();
-            
-            startup(options, config);
+            server && server.destroy(() => setTimeout(() => startup(options, config), 500));
         });
     }
 

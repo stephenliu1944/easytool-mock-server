@@ -76,7 +76,6 @@ Options:
         status: 200,        // 默认
         // 'headers' 用于设置响应的头信息, 下方是默认配置.
         headers: {          // 默认
-            'Fake-Data': 'true',
             'Content-Type': 'application/json; charset=UTF-8',
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
@@ -112,7 +111,6 @@ module.exports = {
     // 全局的响应配置, 会合并到你指定的某个具体的响应配置上.
     response: {
         headers: {                      // 默认
-            'Fake-Data': 'true',
             'Content-Type': 'application/json; charset=UTF-8',
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
