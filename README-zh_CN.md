@@ -97,7 +97,18 @@ fake-http ./data --config=fake.config.js
 
 fake.config.js
 ```js
-{
+var path = require('path');
+
+module.exports = {
+    host: 'localhost',                  // 默认
+    port: 3000,                         // 默认
+    watch: false,                       // 默认
+    // 保存响应返回的文件目录
+    staticPath: path.resolve(__dirname, './static'),    // 可选
+    // 遍历搜索匹配的 mock 文件的顺序, 默认按字母排序.
+    searchOrder(filenames) {
+        return filenames.sort();        // 默认
+    },
     // 全局的响应配置, 会合并到你指定的某个具体的响应配置上.
     response: {
         headers: {                      // 默认
@@ -106,12 +117,6 @@ fake.config.js
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
         }
-    },
-    // 保存响应返回的文件目录
-    staticPath: '/static',          // 默认
-    // 遍历搜索匹配的 mock 文件的顺序, 默认按字母排序.
-    searchOrder(filenames) {
-        return filenames.sort();    // 默认
     }
 }
 ```

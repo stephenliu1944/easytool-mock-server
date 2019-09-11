@@ -13,6 +13,8 @@ function getSettings(configFile) {
         return;
     }
 
+    // 清除缓存
+    delete require.cache[configFile];
     var settings = require(configFile);
 
     if (settings && settings.response && settings.response.headers) {
@@ -32,7 +34,7 @@ function sendResponse(mockResponse, staticPath, res, next) {
         // body 类型为 string 并且以 .xxx 结尾( 1 <= x <= 5), 代表是文件路径.
         if (/\.\w{1,5}$/.test(body)) {
             if (!fs.existsSync(staticPath)) {
-                next(`Please set staticPath option and put the file "${body}" in that path.`);
+                next(`Please set "staticPath" option and put the file "${body}" in that path.`);
             } else if (!fs.existsSync(path.join(staticPath, body))) {
                 next(`Can not find file "${body}" in "${staticPath}".`);
             } else {
@@ -61,19 +63,20 @@ function watchDirectories(directories = [], callback) {
 }
 
 function startup(options = {}, config) {
+    const { sourcePath, ...other }  = options;
+    
+    if (!sourcePath) {
+        throw('sourcePath option is required.');
+    }
+
     const {
         host, 
         port, 
         watch,      
-        sourcePath, 
         staticPath, 
         searchOrder,
         response: defaultResponse
-    } = merge({}, defaultSettings, getSettings(config), options);  // 注意: defaultSettings.response.headers 格式
-
-    if (!sourcePath) {
-        throw('sourcePath option is required.');
-    }
+    } = merge({}, defaultSettings, getSettings(config), other);  // 注意: defaultSettings.response.headers 格式
 
     app.use(function(req, res, next) {
         try {

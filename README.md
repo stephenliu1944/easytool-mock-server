@@ -96,7 +96,18 @@ fake-http ./data --config=fake.config.js
 
 fake.config.js
 ```js
-{
+var path = require('path');
+
+module.exports = {
+    host: 'localhost',          // default
+    port: 3000,                 // default
+    watch: false,               // default
+    // store resources directory
+    staticPath: path.resolve(__dirname, './static'),    // optional
+    // search order with fake data files.
+    searchOrder(filenames) {
+        return filenames.sort();    // default
+    },
     // global response settings
     response: {
         // will merge to your specific response headers.
@@ -106,12 +117,6 @@ fake.config.js
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
         }
-    },
-    // store resources directory
-    staticPath: '/static',          // default
-    // search order with fake data files.
-    searchOrder(filenames) {
-        return filenames.sort();    // default
     }
 }
 ```
