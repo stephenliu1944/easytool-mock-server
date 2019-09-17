@@ -6,7 +6,7 @@ const pkg = require('../../package.json');
 const server = require('../server');
 
 const { _, host, port, watch, static: staticPath, config } = yargs
-    .usage('fake-http [options] <source>')
+    .usage('mock-server [options] <source>')
     .options({
         host: {
             alias: 'H',
@@ -27,7 +27,6 @@ const { _, host, port, watch, static: staticPath, config } = yargs
         config: {
             alias: 'c',
             description: 'Path to config file'
-            // default: 'fake.config.js'
         }
     })
     .boolean('watch')

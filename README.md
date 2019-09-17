@@ -1,21 +1,21 @@
-# fake-http
-For front-end developers who need a quick back-end for fake data.
+# mock-server
+For front-end developers who need a quick back-end for mock data.
 
 README: [English](https://github.com/stephenliu1944/mock-server/blob/dev/README.md) | [简体中文](https://github.com/stephenliu1944/mock-server/blob/dev/README-zh_CN.md)
 ## Features
-- fake data
-- fake file download
+- mock data
+- mock file download
 - Matching by request URL and method
 - Custom Response delay, status and headers
 - Support third-party simulation data lib, like Mock.js and Faker.js
 
 ## Install
 ```
-npm install -g fake-http
+npm install -g @middlend/mock-server
 ```
 
 ## Usage
-### 1. Write fake data in source directory
+### 1. Write mock data in source directory
 data/user.js
 ```js
 module.exports = [{
@@ -32,9 +32,9 @@ module.exports = [{
 }];
 ```
 
-### 2. Start fake server
+### 2. Start mock server
 ```js
-fake-http ./data
+mock-server ./data
 ```
 
 ### 3. Request URL
@@ -44,7 +44,7 @@ http://localhost:3000/user/1
 
 ## CLI 
 ```js
-fake-http [options] <source>
+mock-server [options] <source>
 
 Options:
   --config, -c       Path to config file
@@ -90,10 +90,10 @@ You could add any js file or folder to source directory. Nested files are suppor
 ### Default Settings
 You could configure default setting in config file.
 ```js
-fake-http ./data --config=fake.config.js
+mock-server ./data --config=mock.config.js
 ```
 
-fake.config.js
+mock.config.js
 ```js
 var path = require('path');
 
@@ -103,7 +103,7 @@ module.exports = {
     watch: false,               // default
     // store resources directory
     staticPath: path.resolve(__dirname, './static'),    // optional
-    // search order with fake data files.
+    // search order with mock data files.
     searchOrder(filenames) {
         return filenames.sort();    // default
     },
@@ -136,7 +136,7 @@ There are three pattern to match request url.
 ```
 
 ## Example
-### Fake data
+### Mock data
 GET http://localhost:3000/user/list
 ```js
 module.exports = [{
@@ -159,10 +159,10 @@ module.exports = [{
 }];
 ```
 ```js
-fake-http ./data
+mock-server ./data
 ```
 
-### Fake file download
+### Mock file download
 POST http://localhost:3000/download/sample
 ./data
 ```js
@@ -183,7 +183,7 @@ module.exports = [{
 ```
 
 ```js
-fake-http ./data --static=./static
+mock-server ./data --static=./static
 ```
 
 ### Work with Mock.js

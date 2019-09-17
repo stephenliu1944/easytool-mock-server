@@ -1,4 +1,4 @@
-# fake-http
+# mock-server
 该服务用于快速模拟HTTP请求数据.
 
 README: [English](https://github.com/stephenliu1944/mock-server/blob/dev/README.md) | [简体中文](https://github.com/stephenliu1944/mock-server/blob/dev/README-zh_CN.md)
@@ -11,7 +11,7 @@ README: [English](https://github.com/stephenliu1944/mock-server/blob/dev/README.
 
 ## 安装
 ```
-npm install -g fake-http
+npm install -g @middlend/mock-server
 ```
 
 ## 示例
@@ -35,7 +35,7 @@ module.exports = [{
 ### 2. 启动服务
 "./data"参数为模拟数据所在目录
 ```js
-fake-http ./data
+mock-server ./data
 ```
 
 ### 3. 请求 URL
@@ -45,7 +45,7 @@ http://localhost:3000/user/1
 
 ## 命令行
 ```js
-fake-http [options] <source>
+mock-server [options] <source>
 
 Options:
   --config, -c       配置文件所在路径
@@ -91,10 +91,10 @@ Options:
 ### 默认设置
 可以在配置文件中修改默认配置.
 ```js
-fake-http ./data --config=fake.config.js
+mock-server ./data --config=mock.config.js
 ```
 
-fake.config.js
+mock.config.js
 ```js
 var path = require('path');
 

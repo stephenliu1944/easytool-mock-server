@@ -65,7 +65,7 @@ function startup(options = {}, config) {
     var { sourcePath, ...other } = options;
     
     if (!sourcePath) {
-        throw('sourcePath option is required.');
+        throw new Error('sourcePath option is required.');
     }
 
     // 注意: defaultSettings.response.headers 格式需要大写开头
@@ -88,7 +88,7 @@ function startup(options = {}, config) {
                 let response = merge({}, defaultResponse, mockResponse);
                 sendResponse(response, _staticPath, res, next);
             } else {
-                error = new Error(`No matching data could be found.`);
+                error = new Error('No matching data could be found.');
                 error.status = 404;
                 next(error);
             }
@@ -104,7 +104,9 @@ function startup(options = {}, config) {
             error.status = 500;
         }
         
+        // eslint-disable-next-line
         console.info(req.url, error.status);
+        // eslint-disable-next-line
         console.error(error.message);
 
         res.set({
@@ -116,7 +118,8 @@ function startup(options = {}, config) {
     });
     
     var server = app.listen(port, host, function() {
-        console.info('Fake Server listening on port ' + port);
+        // eslint-disable-next-line
+        console.info('Mock Server listening on port ' + port);
     });
 
     // enhance with a 'destroy' function
