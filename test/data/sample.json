@@ -1,0 +1,11 @@
+{
+    "request": {
+        "url": "/json/:id"
+    },
+    "response": {
+        "body": {
+            "statusCode": 1000,
+            "data": []
+        }
+    }
+}

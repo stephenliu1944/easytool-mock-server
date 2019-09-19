@@ -36,7 +36,7 @@ function isMatchingItem(req = {}, item = {}) {
     var { path: reqURL, method: reqMethod, protocol: reqProtocol, headers: reqHeaders } = req;
 
     if (!itemURL) {
-        throw(`Missing "url" option in ${JSON.stringify(item)}.`);
+        throw (`Missing "url" option in ${JSON.stringify(item)}.`);
     }
 
     reqURL = reqURL.replace(/^\//, '').replace(/\/$/, '');          // 移除开头和末尾的 "/"
@@ -70,7 +70,16 @@ function isMatchingItem(req = {}, item = {}) {
 
 function getMatchingItem(req, filePath) {
     // 不直接使用 require() 为避免缓存
-    let mockData = requireS(fs.readFileSync(filePath, 'utf-8')) || [];
+    let mockData = [];
+    let file = fs.readFileSync(filePath, 'utf-8');
+
+    // 处理 js 文件
+    if (/.js$/.test(filePath)) {
+        mockData = requireS(file) || [];
+    // 处理 json 文件
+    } else if (/.json$/.test(filePath)) {
+        mockData = JSON.parse(file);
+    }
 
     if (typeof mockData === 'object' && !Array.isArray(mockData)) {
         mockData = [mockData];
@@ -85,7 +94,7 @@ function searchMatchingItem(req, sourcePath, searchOrder) {
     try {
         filenames = fs.readdirSync(sourcePath);
     } catch (e) {
-        throw(`Can not find any source files in "${sourcePath}".`);
+        throw (`Can not find any source files in "${sourcePath}".`);
     }
     
     if (filenames && filenames.length > 0) {
@@ -99,6 +108,7 @@ function searchMatchingItem(req, sourcePath, searchOrder) {
             let filename = filenames[i];
             let filePath = path.join(sourcePath, filename);
             let fileStat = fs.statSync(filePath);
+            
             // 是文件则对比请求与文件中的 mock 数据是否匹配
             if (fileStat.isFile()) {
                 matchingData = getMatchingItem(req, filePath);
