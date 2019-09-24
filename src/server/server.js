@@ -7,6 +7,7 @@ var enableDestroy = require('server-destroy');
 var defaultSettings = require('./defaults');
 var { formatContentType, searchMatchingItem } = require('./utils');
 
+const STATIC_PATH = '<static>';
 var watcherList = [];
 
 function getSettings(configFile) {
@@ -33,13 +34,18 @@ function sendResponse(mockResponse, staticPath, res, next) {
         // body 类型为 string 并且以 .xxx 结尾( 1 <= x <= 5), 代表是文件路径.
         if (/\.\w{1,5}$/.test(body)) {
             if (!fs.existsSync(staticPath)) {
-                next(`Please set "staticPath" option and put the file "${body}" in that path.`);
-            } else if (!fs.existsSync(path.join(staticPath, body))) {
-                next(`Can not find file "${body}" in "${staticPath}".`);
+                next('Please set "staticPath" option when you want to response file.');
+                return;
+            }
+
+            let url = body.replace(STATIC_PATH, staticPath);
+
+            if (!fs.existsSync(url)) {
+                next(`Can not find file from "${url}".`);
             } else {
                 // TODO: 支持远程文件传输
-                res.sendFile(body, {    // 发送文件
-                    root: staticPath
+                res.sendFile(url, {    // 发送文件
+                    // root: staticPath
                 }, function(err) {
                     err && next(err);
                 });
@@ -62,7 +68,7 @@ function watchDirectories(directories = [], callback) {
 }
 
 function startup(options = {}, config) {
-    var { sourcePath, ...other } = options;
+    var { sourcePath, staticPath, ...other } = options;
     
     if (!sourcePath) {
         throw new Error('sourcePath option is required.');
@@ -70,11 +76,11 @@ function startup(options = {}, config) {
 
     // 注意: defaultSettings.response.headers 格式需要大写开头
     var _options = merge({}, defaultSettings, getSettings(config), other);
-    var { host, port, watch, staticPath } = _options;  
+    var { host, port, watch } = _options;  
     app.set('options', _options);
 
     app.use(function(req, res, next) {
-        var { staticPath: _staticPath, searchOrder, response: defaultResponse } = app.get('options');
+        var { searchOrder, response: defaultResponse } = app.get('options');
 
         try {
             var error;
@@ -86,7 +92,7 @@ function startup(options = {}, config) {
                     mockResponse.headers = formatContentType(mockResponse.headers);
                 }
                 let response = merge({}, defaultResponse, mockResponse);
-                sendResponse(response, _staticPath, res, next);
+                sendResponse(response, staticPath, res, next);
             } else {
                 error = new Error('No matching data could be found.');
                 error.status = 404;

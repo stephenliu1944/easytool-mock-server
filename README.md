@@ -101,8 +101,6 @@ module.exports = {
     host: 'localhost',          // default
     port: 3000,                 // default
     watch: false,               // default
-    // store resources directory
-    staticPath: path.resolve(__dirname, './static'),    // optional
     // search order with mock data files.
     searchOrder(filenames) {
         return filenames.sort();    // default
@@ -177,7 +175,7 @@ module.exports = [{
             'Content-Type': 'text/plain',
             'Content-Disposition': 'attachment;filename=sample.txt;'
         },
-        body: 'sample.txt'      // store download file sample.txt to static directory(use --static argument to set).
+        body: '<static>/sample.txt'      // store download file sample.txt to static directory(use --static argument to set).
     }
 }];
 ```

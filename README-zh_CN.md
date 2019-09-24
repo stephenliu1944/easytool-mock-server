@@ -102,8 +102,6 @@ module.exports = {
     host: 'localhost',                  // 默认
     port: 3000,                         // 默认
     watch: false,                       // 默认
-    // 保存响应返回的文件目录
-    staticPath: path.resolve(__dirname, './static'),    // 可选
     // 遍历搜索匹配的 mock 文件的顺序, 默认按字母排序.
     searchOrder(filenames) {
         return filenames.sort();        // 默认
@@ -173,7 +171,7 @@ module.exports = [{
             'Content-Type': 'text/plain',
             'Content-Disposition': 'attachment;filename=sample.txt;'
         },
-        body: 'sample.txt'      // 需要将模拟下载的文件保存在静态资源(static参数配置的)目录中.
+        body: '<static>/sample.txt'      // 需要将模拟下载的文件保存在静态资源(static参数配置的)目录中.
     }
 }];
 ```
