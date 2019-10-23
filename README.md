@@ -11,7 +11,7 @@ README: [English](https://github.com/stephenliu1944/mock-server/blob/dev/README.
 
 ## Install
 ```
-npm install -g @middlend/mock-server
+npm install -g @easytool/mock-server
 ```
 
 ## Usage
