@@ -88,7 +88,7 @@ function watchDirectories(directories = [], callback) {
 }
 // 启动服务
 function startup(options = {}, config) {
-    var { sourcePath, staticPath, proxy, ...other } = options;
+    var { sourcePath, staticPath, ...other } = options;
     
     if (!sourcePath) {
         throw new Error('sourcePath option is required.');
@@ -96,7 +96,7 @@ function startup(options = {}, config) {
 
     // 注意: defaultSettings.response.headers 格式需要大写开头
     var opts = merge({}, defaultSettings, getSettings(config), other);
-    var { host, port, watch } = opts;
+    var { host, port, proxy, watch } = opts;
 
     app.set('options', opts);
     app.use(function(req, res, next) {

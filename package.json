@@ -1,6 +1,6 @@
 {
   "name": "@easytool/mock-server",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "description": "For front-end developers who need a quick back-end for mock data.",
   "main": "lib/server/index.js",
   "bin": {
