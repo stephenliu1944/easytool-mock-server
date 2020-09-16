@@ -1,9 +1,9 @@
 var fs = require('fs');
-var path = require('path');
 var requireS = require('require-from-string');
 var app = require('express')();
 var merge = require('lodash/merge');
 var enableDestroy = require('server-destroy');
+var mockError = require('./error');
 var defaultSettings = require('./defaults');
 var { formatContentType, searchMatchingItem } = require('./utils');
 
@@ -34,26 +34,46 @@ function sendResponse(mockResponse, staticPath, res, next) {
         // body 类型为 string 并且以 .xxx 结尾( 1 <= x <= 5), 代表是文件路径.
         if (/\.\w{1,5}$/.test(body)) {
             if (!fs.existsSync(staticPath)) {
-                next('Please set "staticPath" option when you want to response file.');
+                next(mockError('Please set "staticPath" option when you want to response file.'));
                 return;
             }
 
             let url = body.replace(STATIC_PATH, staticPath);
 
             if (!fs.existsSync(url)) {
-                next(`Can not find file from "${url}".`);
+                next(mockError(`Can not find file from "${url}".`));
             } else {
                 // TODO: 支持远程文件传输
                 res.sendFile(url, {    // 发送文件
                     // root: staticPath
                 }, function(err) {
-                    err && next(err);
+                    err && next(mockError(err));
                 });
             }
         } else {
             res.send(body);
         }
     }, delay);
+}
+
+function handleError(error, req, res, next) {
+    // 异常处理
+    if (typeof error === 'string') {
+        error = new Error(error);
+        error.status = 500;
+    }
+    
+    // eslint-disable-next-line
+    console.info(req.url, error.status);
+    // eslint-disable-next-line
+    console.error(error.message);
+
+    res.set({
+        'Content-Type': 'text/plain',
+        'Content-Disposition': 'inline'
+    });
+    res.status(error.status);
+    res.send(error.message);
 }
 
 function watchDirectories(directories = [], callback) {
@@ -66,26 +86,26 @@ function watchDirectories(directories = [], callback) {
         }
     });
 }
-
+// 启动服务
 function startup(options = {}, config) {
-    var { sourcePath, staticPath, ...other } = options;
+    var { sourcePath, staticPath, proxy, ...other } = options;
     
     if (!sourcePath) {
         throw new Error('sourcePath option is required.');
     }
 
     // 注意: defaultSettings.response.headers 格式需要大写开头
-    var _options = merge({}, defaultSettings, getSettings(config), other);
-    var { host, port, watch } = _options;  
-    app.set('options', _options);
+    var opts = merge({}, defaultSettings, getSettings(config), other);
+    var { host, port, watch } = opts;
 
+    app.set('options', opts);
     app.use(function(req, res, next) {
-        var { searchOrder, response: defaultResponse } = app.get('options');
+        let { searchOrder, response: defaultResponse } = app.get('options');
 
         try {
-            var error;
             // 从 mock data 数据源中找到匹配的数据
-            var mockDataItem = searchMatchingItem(req, sourcePath, searchOrder);
+            let mockDataItem = searchMatchingItem(req, sourcePath, searchOrder);
+            
             if (mockDataItem) {
                 let mockResponse = mockDataItem.response;
                 if (mockResponse.headers) {
@@ -93,35 +113,29 @@ function startup(options = {}, config) {
                 }
                 let response = merge({}, defaultResponse, mockResponse);
                 sendResponse(response, staticPath, res, next);
+            // 如果配置了代理, 则交给代理处理
+            } else if (proxy) {
+                next();
             } else {
-                error = new Error('No matching data could be found.');
-                error.status = 404;
-                next(error);
+                next(mockError('No matching data could be found.', 404));
             }
         } catch (e) {
-            next(e);
+            next(mockError(e));
         }
     });
-    
-    // handle error middleware
-    app.use(function(error, req, res, next) {
-        if (typeof error === 'string') {
-            error = new Error(error);
-            error.status = 500;
-        }
-        
-        // eslint-disable-next-line
-        console.info(req.url, error.status);
-        // eslint-disable-next-line
-        console.error(error.message);
 
-        res.set({
-            'Content-Type': 'text/plain',
-            'Content-Disposition': 'inline'
-        });
-        res.status(error.status);
-        res.send(error.message);
-    });
+    // 配置了代理服务
+    if (proxy) {
+        let httpProxy = require('http-proxy-middleware');
+        // 0.19 & 1.0兼容性处理
+        let proxyMiddleware = httpProxy.createProxyMiddleware || httpProxy;
+        let proxyOpts = typeof proxy === 'object' ? proxy : { target: proxy, changeOrigin: true };
+
+        app.use(proxyMiddleware(proxyOpts));
+    }
+
+    // handle error middleware
+    app.use(handleError);
     
     var server = app.listen(port, host, function() {
         // eslint-disable-next-line

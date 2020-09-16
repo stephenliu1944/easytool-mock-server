@@ -8,6 +8,7 @@ README: [English](https://github.com/stephenliu1944/mock-server/blob/dev/README.
 - Matching by request URL and method
 - Custom Response delay, status and headers
 - Support third-party simulation data lib, like Mock.js and Faker.js
+- Support forward to other api server (by http-proxy-middleware) when no matching data in mock server
 
 ## Install
 ```
@@ -49,13 +50,45 @@ mock-server [options] <source>
 Options:
   --config, -c       Path to config file
   --host, -H         Set host                             [default: "localhost"]
-  --port, -p         Set port                                    [default: 3000]
+  --port, -P         Set port                                    [default: 3000]
+  --proxy, -p        Set http-proxy-middleware target                   [string]
   --watch, -w        Watch file(s)                                     [boolean]
-  --static, -s       Set static(download) files directory
+  --static, -s       Set static(download) files directory               [string]
+```
+
+### Example
+```
+mock-server -H localhost -P 3001 -p http://api.xxx.com ./data
+```
+
+## API
+```
+startup({
+    host,
+    port,
+    proxy,           // Set http-proxy-middleware options when No matching data in mock server then will use this proxy
+    watch,
+    sourcePath,      // mock data file path
+    staticPath       // mock download file path
+}, settings)         // global config
+```
+
+### Example
+```
+let mockServer = require('@easytool/mock-server');
+
+mockServer.startup({
+    host: 'localhost',
+    port: 3001,
+    proxy: 'http://api.xxx.com' || { target: http://api.xxx.com },
+    watch: true,
+    sourcePath: './data',
+    staticPath: './static'
+});
 ```
 
 ## Config
-### Data format
+### Mock Data Format
 You could add any js file or folder to source directory. Nested files are supported and use DFS.
 ```js
 {
@@ -77,6 +110,7 @@ You could add any js file or folder to source directory. Nested files are suppor
         headers: {          // default
             'Content-Type': 'application/json; charset=UTF-8',
             'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Credentials': 'true',
             'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
         },
         // 'body' is use for set response body, string, object and array are supported, if type to String and end with '.xxx' means this is a file path and root path is by --static argument, you can change it in default setting with "staticPath" option.
@@ -100,6 +134,7 @@ var path = require('path');
 module.exports = {
     host: 'localhost',          // default
     port: 3000,                 // default
+    proxy: false,               // default, support http-proxy-middleware options
     watch: false,               // default
     // search order with mock data files.
     searchOrder(filenames) {
@@ -162,7 +197,6 @@ mock-server ./data
 
 ### Mock file download
 POST http://localhost:3000/download/sample
-./data
 ```js
 module.exports = [{
     request: {
