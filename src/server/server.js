@@ -117,7 +117,7 @@ function startup(options = {}, config) {
             } else if (proxy) {
                 next();
             } else {
-                next(mockError('No matching data could be found.', 404));
+                next(mockError('No matching data was found on mock server.', 404));
             }
         } catch (e) {
             next(mockError(e));
