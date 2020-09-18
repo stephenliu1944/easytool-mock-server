@@ -32,8 +32,12 @@ function convertPathSyntaxToReg(pathSyntax) {
 }
 
 function isMatchingItem(req = {}, item = {}) {
-    var { url: itemURL, method: itemMethod, protocol: itemProtocol, headers: itemHeaders } = Object.assign({}, item, item.request);
     var { path: reqURL, method: reqMethod, protocol: reqProtocol, headers: reqHeaders } = req;
+    var { url: itemURL, method: itemMethod, protocol: itemProtocol, headers: itemHeaders } = Object.assign({}, item, item.request);
+
+    if (item.ignore) {
+        return false;
+    }
 
     if (!itemURL) {
         throw (`Missing "url" option in ${JSON.stringify(item)}.`);
@@ -112,7 +116,7 @@ function searchMatchingItem(req, sourcePath, searchOrder) {
             // 是文件则对比请求与文件中的 mock 数据是否匹配
             if (fileStat.isFile()) {
                 matchingData = getMatchingItem(req, filePath);
-                // 是目录则继续递归
+            // 是目录则继续递归
             } else if (fileStat.isDirectory()) {
                 matchingData = searchMatchingItem(req, filePath, searchOrder);
             }

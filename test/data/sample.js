@@ -20,7 +20,7 @@ module.exports = [{
     response: {
         body: {
             id: 123,
-            name: 'Stephen',
+            name: 'Stephen2',
             email: 'xxx@gmail.com'
         }
     }
@@ -32,7 +32,7 @@ module.exports = [{
     response: {
         body: {
             id: 123,
-            name: 'Stephen',
+            name: 'Stephen3',
             email: 'xxx@gmail.com'
         }
     }

@@ -92,6 +92,8 @@ mockServer.startup({
 You could add any js file or folder to source directory. Nested files are supported and use DFS.
 ```js
 {
+    // ignore this item
+    ignore: false,              // optional
     // 'request' is use for matching response data
     request: {
         // 'url' is use for compare request url.

@@ -103,7 +103,7 @@ function startup(options = {}, config) {
         let { searchOrder, response: defaultResponse } = app.get('options');
 
         try {
-            // 从 mock data 数据源中找到匹配的数据
+            // 从 mock data 中找到匹配的数据
             let mockDataItem = searchMatchingItem(req, sourcePath, searchOrder);
             
             if (mockDataItem) {

@@ -8,6 +8,7 @@ README: [English](https://github.com/stephenliu1944/mock-server/blob/dev/README.
 - 通过请求的 URL 和 method 匹配响应信息
 - 自定义响应延迟时间, 状态码, 头信息
 - 支持第三方数据模拟库, 如 Mock.js 和 Faker.js
+- 支持搜索不到模拟数据时, 将请求转发到代理服务
 
 ## 安装
 ```
@@ -50,9 +51,41 @@ mock-server [options] <source>
 Options:
   --config, -c       配置文件所在路径
   --host, -H         设置主机                              [default: "localhost"]
-  --port, -p         设置端口号                                   [default: 3000]
-  --watch, -w        是否监听文件变化                                    [boolean]
+  --port, -P         设置端口号                                   [default: 3000]
+  --proxy, -p        设置 http-proxy-middleware 代理                     [string]
+  --watch, -w        是否监听文件变化                                   [boolean]
   --static, -s       设置静态资源(下载)文件路径
+```
+
+### 示例
+```
+mock-server -H localhost -P 3001 -p http://api.xxx.com ./data
+```
+
+## API
+```
+startup({
+    host,
+    port,
+    proxy,           // 当mock server未找到对应模拟数据时会转到代理服务, 支持 http-proxy-middleware 配置
+    watch,
+    sourcePath,      // 模拟数据文件的目录
+    staticPath       // 模拟下载文件的目录
+}, settings)         // 全局配置
+```
+
+### 示例
+```
+let mockServer = require('@easytool/mock-server');
+
+mockServer.startup({
+    host: 'localhost',
+    port: 3001,
+    proxy: 'http://api.xxx.com' || { target: http://api.xxx.com },
+    watch: true,
+    sourcePath: './data',
+    staticPath: './static'
+});
 ```
 
 ## 配置
@@ -60,6 +93,8 @@ Options:
 可以将任何js文件添加到数据文件目录中, 支持文件嵌套, 服务器会递归查询(采用深度优先查找).
 ```js
 {
+    // 忽略该项配置
+    ignore: false,              // 可选
     // 'request' 用于匹配请求, 根据请求返回对应的响应信息
     request: {  
         // 'url' 用于对比请求的URL.
@@ -101,6 +136,7 @@ var path = require('path');
 module.exports = {
     host: 'localhost',                  // 默认
     port: 3000,                         // 默认
+    proxy: false,                       // 默认, 支持 http-proxy-middleware 选项
     watch: false,                       // 默认
     // 遍历搜索匹配的 mock 文件的顺序, 默认按字母排序.
     searchOrder(filenames) {
