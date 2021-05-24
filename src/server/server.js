@@ -10,12 +10,13 @@ var { formatContentType, searchMatchingItem } = require('./utils');
 const STATIC_PATH = '<static>';
 var watcherList = [];
 
-function getSettings(configFile) {
-    if (!fs.existsSync(configFile)) {
+function getSettings(file) {
+    if (!fs.existsSync(file)) {
         return;
     }
     // 不直接使用 require() 为避免缓存
-    var settings = requireS(fs.readFileSync(configFile, 'utf-8'));
+    var code = fs.readFileSync(file, 'utf8');
+    var settings = requireS(code, file);
 
     if (settings && settings.response && settings.response.headers) {
         settings.response.headers = formatContentType(settings.response.headers);
